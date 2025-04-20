@@ -37,7 +37,7 @@ jobs:
             sarif_file: codeguru-results.sarif.json
       
       - name: Upload SARIF as artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
             name: codeguru-sarif
             path: codeguru-results.sarif.json
