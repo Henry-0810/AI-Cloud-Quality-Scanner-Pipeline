@@ -21,12 +21,13 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
-
+    
+          #No more S3 bucket is needed for the CodeGuru Reviewer action
       - name: Run CodeGuru Reviewer
         uses: aws-actions/codeguru-reviewer@v1.1
         with:
           build_path: . 
-          s3_bucket: ${{ secrets.S3_BUCKET }}
+          s3_bucket: 
 
       - name: Upload review result
         if: ${{ github.event_name != 'push' }}
