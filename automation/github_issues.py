@@ -5,7 +5,7 @@ import requests
 SARIF_PATH = "sarif-artifacts/codeguru-results.sarif.json"
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 REPO = os.getenv("GITHUB_REPOSITORY")
-API_URL = f"https://api.github.com/repos/henry-0810/{REPO}/issues"
+API_URL = f"https://api.github.com/repos/{REPO}/issues"
 
 
 def parse_codeguru_sarif(path):
