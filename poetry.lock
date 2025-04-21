@@ -13,6 +13,46 @@ files = [
 ]
 
 [[package]]
+name = "boto3"
+version = "1.37.37"
+description = "The AWS SDK for Python"
+optional = false
+python-versions = ">=3.8"
+groups = ["main"]
+files = [
+    {file = "boto3-1.37.37-py3-none-any.whl", hash = "sha256:d125cb11e22817f7a2581bade4bf7b75247b401888890239ceb5d3e902ccaf38"},
+    {file = "boto3-1.37.37.tar.gz", hash = "sha256:752d31105a45e3e01c8c68471db14ae439990b75a35e72b591ca528e2575b28f"},
+]
+
+[package.dependencies]
+botocore = ">=1.37.37,<1.38.0"
+jmespath = ">=0.7.1,<2.0.0"
+s3transfer = ">=0.11.0,<0.12.0"
+
+[package.extras]
+crt = ["botocore[crt] (>=1.21.0,<2.0a0)"]
+
+[[package]]
+name = "botocore"
+version = "1.37.37"
+description = "Low-level, data-driven core of boto 3."
+optional = false
+python-versions = ">=3.8"
+groups = ["main"]
+files = [
+    {file = "botocore-1.37.37-py3-none-any.whl", hash = "sha256:eb730ff978f47c02f0c8ed07bccdc0db6d8fa098ed32ac31bee1da0e9be480d1"},
+    {file = "botocore-1.37.37.tar.gz", hash = "sha256:3eadde6fed95c4cb469cc39d1c3558528b7fa76d23e7e16d4bddc77250431a64"},
+]
+
+[package.dependencies]
+jmespath = ">=0.7.1,<2.0.0"
+python-dateutil = ">=2.1,<3.0.0"
+urllib3 = {version = ">=1.25.4,<2.2.0 || >2.2.0,<3", markers = "python_version >= \"3.10\""}
+
+[package.extras]
+crt = ["awscrt (==0.23.8)"]
+
+[[package]]
 name = "certifi"
 version = "2025.1.31"
 description = "Python package for providing Mozilla's CA Bundle."
@@ -448,6 +488,18 @@ MarkupSafe = ">=2.0"
 i18n = ["Babel (>=2.7)"]
 
 [[package]]
+name = "jmespath"
+version = "1.0.1"
+description = "JSON Matching Expressions"
+optional = false
+python-versions = ">=3.7"
+groups = ["main"]
+files = [
+    {file = "jmespath-1.0.1-py3-none-any.whl", hash = "sha256:02e2e4cc71b5bcab88332eebf907519190dd9e6e82107fa7f83b1003a6252980"},
+    {file = "jmespath-1.0.1.tar.gz", hash = "sha256:90261b206d6defd58fdd5e85f478bf633a2901798906be2ad389150c5c60edbe"},
+]
+
+[[package]]
 name = "jwt"
 version = "1.3.1"
 description = "JSON Web Token library for Python 3."
@@ -564,6 +616,21 @@ docs = ["sphinx", "sphinx-rtd-theme", "zope.interface"]
 tests = ["coverage[toml] (==5.0.4)", "pytest (>=6.0.0,<7.0.0)"]
 
 [[package]]
+name = "python-dateutil"
+version = "2.9.0.post0"
+description = "Extensions to the standard Python datetime module"
+optional = false
+python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,>=2.7"
+groups = ["main"]
+files = [
+    {file = "python-dateutil-2.9.0.post0.tar.gz", hash = "sha256:37dd54208da7e1cd875388217d5e00ebd4179249f90fb72437e91a35459a0ad3"},
+    {file = "python_dateutil-2.9.0.post0-py2.py3-none-any.whl", hash = "sha256:a8b2bc7bffae282281c8140a97d3aa9c14da0b136dfe83f850eea9a5f7470427"},
+]
+
+[package.dependencies]
+six = ">=1.5"
+
+[[package]]
 name = "requests"
 version = "2.32.3"
 description = "Python HTTP for Humans."
@@ -584,6 +651,36 @@ urllib3 = ">=1.21.1,<3"
 [package.extras]
 socks = ["PySocks (>=1.5.6,!=1.5.7)"]
 use-chardet-on-py3 = ["chardet (>=3.0.2,<6)"]
+
+[[package]]
+name = "s3transfer"
+version = "0.11.5"
+description = "An Amazon S3 Transfer Manager"
+optional = false
+python-versions = ">=3.8"
+groups = ["main"]
+files = [
+    {file = "s3transfer-0.11.5-py3-none-any.whl", hash = "sha256:757af0f2ac150d3c75bc4177a32355c3862a98d20447b69a0161812992fe0bd4"},
+    {file = "s3transfer-0.11.5.tar.gz", hash = "sha256:8c8aad92784779ab8688a61aefff3e28e9ebdce43142808eaa3f0b0f402f68b7"},
+]
+
+[package.dependencies]
+botocore = ">=1.37.4,<2.0a.0"
+
+[package.extras]
+crt = ["botocore[crt] (>=1.37.4,<2.0a.0)"]
+
+[[package]]
+name = "six"
+version = "1.17.0"
+description = "Python 2 and 3 compatibility utilities"
+optional = false
+python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,>=2.7"
+groups = ["main"]
+files = [
+    {file = "six-1.17.0-py2.py3-none-any.whl", hash = "sha256:4721f391ed90541fddacab5acf947aa0d3dc7d27b2e1e8eda2be8970586c3274"},
+    {file = "six-1.17.0.tar.gz", hash = "sha256:ff70335d468e7eb6ec65b95b99d3a2836546063f63acc5171de367e834932a81"},
+]
 
 [[package]]
 name = "sqlalchemy"
@@ -732,4 +829,4 @@ watchdog = ["watchdog (>=2.3)"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.12"
-content-hash = "9e0308d462e2cf6766ef3482a7eb2b3d33b74a252dd31a108e7188a7793f74a9"
+content-hash = "7f8f42fd61ea94c5c32914d291b08a7b1e6c0ceb8d0e33647dac74ceaab9a719"

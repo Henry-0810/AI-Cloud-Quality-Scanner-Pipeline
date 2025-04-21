@@ -52,6 +52,7 @@ jobs:
     # -------------------
     codeguru-security:
         runs-on: ubuntu-latest
+        needs: codeguru-review
 
         steps:
             # Step 1: Checkout the repo
@@ -81,7 +82,7 @@ jobs:
     # -------------------
     post-github-issue:
         name: Post GitHub Issue
-        needs: codeguru-review
+        needs: codeguru-security
         runs-on: ubuntu-latest
 
         steps:
