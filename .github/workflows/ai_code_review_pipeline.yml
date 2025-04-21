@@ -10,12 +10,52 @@ on:
   workflow_dispatch:  
 
 jobs:
-    quality-scan:
+    # -------------------
+    # Step 1: CodeGuru Reviewer
+    # -------------------
+    codeguru-review:
+        runs-on: ubuntu-latest
+
+        steps:
+          - name: Checkout code
+            uses: actions/checkout@v2
+            with:
+                fetch-depth: 0
+
+          - name: Set up AWS credentials
+            uses: aws-actions/configure-aws-credentials@v1
+            with:
+                aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+                aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+                aws-region: us-east-1
+
+          - name: Run CodeGuru Reviewer
+            uses: aws-actions/codeguru-reviewer@v1.1
+            with:
+                build_path: . 
+                s3_bucket: ${{ secrets.S3_BUCKET }}
+
+          - name: Upload review result
+            if: ${{ github.event_name != 'push' }}
+            uses: github/codeql-action/upload-sarif@v1
+            with:
+                sarif_file: codeguru-results.sarif.json
+        
+          - name: Upload SARIF as artifact
+            uses: actions/upload-artifact@v4
+            with:
+                name: codeguru-sarif
+                path: codeguru-results.sarif.json
+
+    # -------------------
+    # Step 2: Run CodeGuru Security
+    # -------------------
+    codeguru-security:
         runs-on: ubuntu-latest
 
         steps:
             # Step 1: Checkout the repo
-            - name: Checkout Code
+            - name: Checkout Code       
               uses: actions/checkout@v3
             
             # Step 2: Set up Python
@@ -31,4 +71,41 @@ jobs:
                 poetry install
             
             # Step 4: Run Code Quality Tools
-            
+
+    # -------------------
+    # Step 3: Run NLP
+    # -------------------   
+    
+    # -------------------
+    # Step 4: Post GitHub Issue with Combined Results
+    # -------------------
+    post-github-issue:
+        name: Post GitHub Issue
+        needs: codeguru-review
+        runs-on: ubuntu-latest
+
+        steps:
+          - name: Checkout Code
+            uses: actions/checkout@v3
+
+          - name: Download SARIF Artifact
+            uses: actions/download-artifact@v4
+            with:
+                name: codeguru-sarif
+                path: sarif-artifacts
+
+          - name: Set up Python
+            uses: actions/setup-python@v4
+            with:
+                python-version: '3.11'
+
+          - name: Install Dependencies
+            run: |
+                pip install poetry
+                poetry install
+
+          - name: Run Python Script to Format & Post GitHub Issue
+            run: |
+                poetry run python automation/github_issues.py
+            env:
+                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}    
