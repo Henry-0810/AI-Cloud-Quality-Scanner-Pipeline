@@ -20,7 +20,12 @@ jobs:
           - name: Checkout code
             uses: actions/checkout@v2
             with:
-                fetch-depth: 0
+                fetch-depth: 1
+          
+          - name: Clean up unneeded files
+            run: |
+              rm -rf .git .venv __pycache__ .pytest_cache node_modules || true
+              sudo apt-get clean
 
           - name: Set up AWS credentials
             uses: aws-actions/configure-aws-credentials@v1
@@ -64,7 +69,7 @@ jobs:
             - name: Set up Python
               uses: actions/setup-python@v4
               with:
-                python-version: '3.11'
+                python-version: '3.12'
             
             # Step 3: Install dependencies
             - name: Install Dependencies
