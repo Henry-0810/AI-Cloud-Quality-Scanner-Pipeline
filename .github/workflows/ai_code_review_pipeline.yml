@@ -32,7 +32,7 @@ jobs:
           - name: Run CodeGuru Reviewer
             uses: aws-actions/codeguru-reviewer@v1.1
             with:
-                build_path: . 
+                build_path: data
                 s3_bucket: ${{ secrets.S3_BUCKET }}
 
           - name: Upload review result
@@ -46,6 +46,7 @@ jobs:
             with:
                 name: codeguru-sarif
                 path: codeguru-results.sarif.json
+                retention-days: 1
 
     # -------------------
     # Step 2: Run CodeGuru Security
