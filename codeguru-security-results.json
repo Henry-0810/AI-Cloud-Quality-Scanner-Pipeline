@@ -1,0 +1,741 @@
+[
+  {
+    "createdAt": "2025-04-22T13:59:47+00:00",
+    "description": "User-provided inputs must be sanitized before being used to generate a SQL database query. An attacker can create and use untrusted input to run query statements that read, modify, or delete database content.",
+    "detectorId": "python/sql-injection@v1.0",
+    "detectorName": "SQL injection",
+    "detectorTags": [
+      "injection",
+      "security",
+      "sql",
+      "owasp-top10",
+      "top25-cwes",
+      "cwe-89",
+      "Python"
+    ],
+    "generatorId": "AmazonCodeGuruSecurity",
+    "id": "2af480e0bc86162b3ea6d191ed749494eeed17b1b9be4b8be7014d3c82ea9b82",
+    "remediation": {
+      "recommendation": {
+        "text": "We detected an SQL command that might use unsanitized input. This can result in an SQL injection. To increase the security of your code, sanitize inputs before using them to form a query string.\n\n[Learn more](https://cwe.mitre.org/data/definitions/89.html)",
+        "url": "https://docs.aws.amazon.com/amazonq/detector-library/python/sql-injection"
+      },
+      "suggestedFixes": [
+        {
+          "code": "@@ -14,7 +14,5 @@\n     username = request.form[\"username\"]\n     password = request.form[\"password\"]\n-    cursor.execute(\n-        f\"INSERT INTO users (username, password) VALUES ('{username}', '{password}')\"\n-    )\n+    cursor.execute(f\"INSERT INTO users (username, password) VALUES (%s, %s)\", (username, password,))\n     conn.commit()\n     return \"User registered\"\n",
+          "description": "Using parameterized queries helps prevent sql-injection attacks by automatically escaping and quoting values."
+        }
+      ]
+    },
+    "resource": {
+      "id": "ai-code-security-scan-1745330385"
+    },
+    "ruleId": "python-sql-injection",
+    "severity": "High",
+    "status": "Open",
+    "title": "CWE-89 - SQL injection",
+    "type": "Software and Configuration Checks",
+    "updatedAt": "2025-04-22T14:00:03.284000+00:00",
+    "vulnerability": {
+      "filePath": {
+        "codeSnippet": [
+          {
+            "content": "",
+            "number": 11
+          },
+          {
+            "content": "@app.route(\"/register\", methods=[\"POST\"])",
+            "number": 12
+          },
+          {
+            "content": "def register():",
+            "number": 13
+          },
+          {
+            "content": "    username = request.form[\"username\"]",
+            "number": 14
+          },
+          {
+            "content": "    password = request.form[\"password\"]",
+            "number": 15
+          },
+          {
+            "content": "    cursor.execute(",
+            "number": 16
+          },
+          {
+            "content": "        f\"INSERT INTO users (username, password) VALUES ('{username}', '{password}')\"",
+            "number": 17
+          },
+          {
+            "content": "    )",
+            "number": 18
+          },
+          {
+            "content": "    conn.commit()",
+            "number": 19
+          },
+          {
+            "content": "    return \"User registered\"",
+            "number": 20
+          },
+          {
+            "content": "",
+            "number": 21
+          }
+        ],
+        "endLine": 16,
+        "name": "app.py",
+        "path": "1-rest-api/flawed/app.py",
+        "startLine": 16
+      },
+      "id": "2af480e0bc86162b3ea6d191ed749494eeed17b1b9be4b8be7014d3c82ea9b82",
+      "referenceUrls": [],
+      "relatedVulnerabilities": [
+        "CWE-89"
+      ]
+    }
+  },
+  {
+    "createdAt": "2025-04-22T13:59:47+00:00",
+    "description": "Allocated resources are not released properly. This can slow down or crash your system. They must be closed along all paths to prevent a resource leak.",
+    "detectorId": "python/resource-leak@v1.0",
+    "detectorName": "Resource leak",
+    "detectorTags": [
+      "availability",
+      "resource-leak",
+      "security",
+      "top25-cwes",
+      "cwe-400",
+      "cwe-664",
+      "Python"
+    ],
+    "generatorId": "AmazonCodeGuruSecurity",
+    "id": "6458ca07db6d35643024c3e3d5ced3cfa1ee27c0a86453ca2d97d245f059169d",
+    "remediation": {
+      "recommendation": {
+        "text": "**Problem**\nThis line of code might contain a resource leak. Resource leaks can cause your system to slow down or crash.\n\n**Fix**\nConsider closing the following resource: *cursor*. The resource is allocated by call *Connection.cursor*. Execution paths that do not contain closure statements were detected. To prevent this resource leak, close *cursor* in a try-finally block or declare it using a `with` statement.\n\n**More info**\n[View details about the `with` statement in the Python developer's guide](https://www.python.org/dev/peps/pep-0343/) (external link).",
+        "url": "https://docs.aws.amazon.com/amazonq/detector-library/python/resource-leak"
+      }
+    },
+    "resource": {
+      "id": "ai-code-security-scan-1745330385"
+    },
+    "ruleId": "python-resource-leak-detector",
+    "severity": "Medium",
+    "status": "Open",
+    "title": "CWE-400,664 - Resource leak",
+    "type": "Software and Configuration Checks",
+    "updatedAt": "2025-04-22T14:00:03.284000+00:00",
+    "vulnerability": {
+      "filePath": {
+        "codeSnippet": [
+          {
+            "content": "import sqlite3",
+            "number": 1
+          },
+          {
+            "content": "from flask import Flask, request",
+            "number": 2
+          },
+          {
+            "content": "",
+            "number": 3
+          },
+          {
+            "content": "app = Flask(__name__)",
+            "number": 4
+          },
+          {
+            "content": "conn = sqlite3.connect(\"users_flawed.db\", check_same_thread=False)",
+            "number": 5
+          },
+          {
+            "content": "cursor = conn.cursor()",
+            "number": 6
+          },
+          {
+            "content": "cursor.execute(",
+            "number": 7
+          },
+          {
+            "content": "    \"CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, username TEXT, password TEXT)\"",
+            "number": 8
+          },
+          {
+            "content": ")",
+            "number": 9
+          },
+          {
+            "content": "",
+            "number": 10
+          },
+          {
+            "content": "",
+            "number": 11
+          }
+        ],
+        "endLine": 6,
+        "name": "app.py",
+        "path": "1-rest-api/flawed/app.py",
+        "startLine": 6
+      },
+      "id": "6458ca07db6d35643024c3e3d5ced3cfa1ee27c0a86453ca2d97d245f059169d",
+      "referenceUrls": [
+        "https://owasp.org/www-community/vulnerabilities/Unreleased_Resource"
+      ],
+      "relatedVulnerabilities": [
+        "CWE-400",
+        "CWE-664"
+      ]
+    }
+  },
+  {
+    "createdAt": "2025-04-22T13:59:47+00:00",
+    "description": "Access credentials, such as passwords and access keys, should not be hardcoded in source code. Hardcoding credentials may cause leaks even after removing them. This is because version control systems might retain older versions of the code. Credentials should be stored securely and obtained from the runtime environment.",
+    "detectorId": "python/hardcoded-credentials@v1.0",
+    "detectorName": "Hardcoded credentials",
+    "detectorTags": [
+      "secrets",
+      "security",
+      "owasp-top10",
+      "top25-cwes",
+      "cwe-798",
+      "Python"
+    ],
+    "generatorId": "AmazonCodeGuruSecurity",
+    "id": "767f41b96e5e804bdb1f789f5426eb162026e199b130aae04edec7fb70150202",
+    "remediation": {
+      "recommendation": {
+        "text": "We detected hardcoded Flask configurations in the application code. Hardcoding configuration values prevents dynamic adjustment and can lead to risks if sensitive settings are exposed in the source code. To remediate, use either `os.getenv()` or  `os.environ.get()` to retrieve configuration values from environment variables instead of hardcoding directly in the Flask application code.\n\n[Learn more](https://cwe.mitre.org/data/definitions/798.html)",
+        "url": "https://docs.aws.amazon.com/amazonq/detector-library/python/hardcoded-credentials"
+      }
+    },
+    "resource": {
+      "id": "ai-code-security-scan-1745330385"
+    },
+    "ruleId": "python-avoid-hardcoded-flask-config",
+    "severity": "Critical",
+    "status": "Open",
+    "title": "CWE-798 - Hardcoded credentials",
+    "type": "Software and Configuration Checks",
+    "updatedAt": "2025-04-22T14:00:03.284000+00:00",
+    "vulnerability": {
+      "filePath": {
+        "codeSnippet": [
+          {
+            "content": "from flask import Flask, request, jsonify",
+            "number": 1
+          },
+          {
+            "content": "import jwt",
+            "number": 2
+          },
+          {
+            "content": "import datetime",
+            "number": 3
+          },
+          {
+            "content": "",
+            "number": 4
+          },
+          {
+            "content": "app = Flask(__name__)",
+            "number": 5
+          },
+          {
+            "content": "app.config['SECRET_KEY'] = 'hardcoded-secret'  # \ud83d\udd34 Secret hardcoded",
+            "number": 6
+          },
+          {
+            "content": "",
+            "number": 7
+          },
+          {
+            "content": "users = {\"alice\": \"password123\"}",
+            "number": 8
+          },
+          {
+            "content": "",
+            "number": 9
+          },
+          {
+            "content": "",
+            "number": 10
+          },
+          {
+            "content": "@app.route('/login', methods=['POST'])",
+            "number": 11
+          }
+        ],
+        "endLine": 6,
+        "name": "app.py",
+        "path": "2-microservice-flow/flawed/auth_service/app.py",
+        "startLine": 6
+      },
+      "id": "767f41b96e5e804bdb1f789f5426eb162026e199b130aae04edec7fb70150202",
+      "referenceUrls": [],
+      "relatedVulnerabilities": [
+        "CWE-798"
+      ]
+    }
+  },
+  {
+    "createdAt": "2025-04-22T13:59:47+00:00",
+    "description": "User-provided inputs must be sanitized before being used to generate a SQL database query. An attacker can create and use untrusted input to run query statements that read, modify, or delete database content.",
+    "detectorId": "python/sql-injection@v1.0",
+    "detectorName": "SQL injection",
+    "detectorTags": [
+      "injection",
+      "security",
+      "sql",
+      "owasp-top10",
+      "top25-cwes",
+      "cwe-89",
+      "Python"
+    ],
+    "generatorId": "AmazonCodeGuruSecurity",
+    "id": "80cfc25039e4708b612436591125c21007f917763c1fd6136c4bff6e2a7ef32c",
+    "remediation": {
+      "recommendation": {
+        "text": "We detected an SQL command that might use unsanitized input. This can result in an SQL injection. To increase the security of your code, sanitize inputs before using them to form a query string.\n\n[Learn more](https://cwe.mitre.org/data/definitions/89.html)",
+        "url": "https://docs.aws.amazon.com/amazonq/detector-library/python/sql-injection"
+      }
+    },
+    "resource": {
+      "id": "ai-code-security-scan-1745330385"
+    },
+    "ruleId": "python-sql-injection",
+    "severity": "High",
+    "status": "Open",
+    "title": "CWE-89 - SQL injection",
+    "type": "Software and Configuration Checks",
+    "updatedAt": "2025-04-22T14:00:03.284000+00:00",
+    "vulnerability": {
+      "filePath": {
+        "codeSnippet": [
+          {
+            "content": "    return \"Login failed\"",
+            "number": 33
+          },
+          {
+            "content": "",
+            "number": 34
+          },
+          {
+            "content": "",
+            "number": 35
+          },
+          {
+            "content": "@app.route(\"/delete_user/<int:id>\")",
+            "number": 36
+          },
+          {
+            "content": "def delete_user(id):",
+            "number": 37
+          },
+          {
+            "content": "    cursor.execute(f\"DELETE FROM users WHERE id = {id}\")",
+            "number": 38
+          },
+          {
+            "content": "    conn.commit()",
+            "number": 39
+          },
+          {
+            "content": "    return \"User deleted\"",
+            "number": 40
+          },
+          {
+            "content": "",
+            "number": 41
+          },
+          {
+            "content": "",
+            "number": 42
+          },
+          {
+            "content": "if __name__ == \"__main__\":",
+            "number": 43
+          }
+        ],
+        "endLine": 38,
+        "name": "app.py",
+        "path": "1-rest-api/flawed/app.py",
+        "startLine": 38
+      },
+      "id": "80cfc25039e4708b612436591125c21007f917763c1fd6136c4bff6e2a7ef32c",
+      "referenceUrls": [],
+      "relatedVulnerabilities": [
+        "CWE-89"
+      ]
+    }
+  },
+  {
+    "createdAt": "2025-04-22T13:59:47+00:00",
+    "description": "Access credentials, such as passwords and access keys, should not be hardcoded in source code. Hardcoding credentials may cause leaks even after removing them. This is because version control systems might retain older versions of the code. Credentials should be stored securely and obtained from the runtime environment.",
+    "detectorId": "python/hardcoded-credentials@v1.0",
+    "detectorName": "Hardcoded credentials",
+    "detectorTags": [
+      "secrets",
+      "security",
+      "owasp-top10",
+      "top25-cwes",
+      "cwe-798",
+      "Python"
+    ],
+    "generatorId": "AmazonCodeGuruSecurity",
+    "id": "83e288d97f83c4ba288018626e38ad144e252b3edc1523013efe43a94d493ae5",
+    "remediation": {
+      "recommendation": {
+        "text": "We detected hardcoded Flask configurations in the application code. Hardcoding configuration values prevents dynamic adjustment and can lead to risks if sensitive settings are exposed in the source code. To remediate, use either `os.getenv()` or  `os.environ.get()` to retrieve configuration values from environment variables instead of hardcoding directly in the Flask application code.\n\n[Learn more](https://cwe.mitre.org/data/definitions/798.html)",
+        "url": "https://docs.aws.amazon.com/amazonq/detector-library/python/hardcoded-credentials"
+      }
+    },
+    "resource": {
+      "id": "ai-code-security-scan-1745330385"
+    },
+    "ruleId": "python-avoid-hardcoded-flask-config",
+    "severity": "Critical",
+    "status": "Open",
+    "title": "CWE-798 - Hardcoded credentials",
+    "type": "Software and Configuration Checks",
+    "updatedAt": "2025-04-22T14:00:03.284000+00:00",
+    "vulnerability": {
+      "filePath": {
+        "codeSnippet": [
+          {
+            "content": "from flask import Flask, request, jsonify",
+            "number": 1
+          },
+          {
+            "content": "import jwt",
+            "number": 2
+          },
+          {
+            "content": "import requests",
+            "number": 3
+          },
+          {
+            "content": "",
+            "number": 4
+          },
+          {
+            "content": "app = Flask(__name__)",
+            "number": 5
+          },
+          {
+            "content": "app.config['SECRET_KEY'] = 'hardcoded-secret'",
+            "number": 6
+          },
+          {
+            "content": "",
+            "number": 7
+          },
+          {
+            "content": "",
+            "number": 8
+          },
+          {
+            "content": "@app.route('/profile', methods=['GET'])",
+            "number": 9
+          },
+          {
+            "content": "def profile():",
+            "number": 10
+          },
+          {
+            "content": "    token = request.args.get(\"token\")  # \ud83d\udd34 Token passed via URL, insecure",
+            "number": 11
+          }
+        ],
+        "endLine": 6,
+        "name": "app.py",
+        "path": "2-microservice-flow/flawed/profile_service/app.py",
+        "startLine": 6
+      },
+      "id": "83e288d97f83c4ba288018626e38ad144e252b3edc1523013efe43a94d493ae5",
+      "referenceUrls": [],
+      "relatedVulnerabilities": [
+        "CWE-798"
+      ]
+    }
+  },
+  {
+    "createdAt": "2025-04-22T13:59:47+00:00",
+    "description": "Access credentials, such as passwords and access keys, should not be hardcoded in source code. Hardcoding credentials may cause leaks even after removing them. This is because version control systems might retain older versions of the code. Credentials should be stored securely and obtained from the runtime environment.",
+    "detectorId": "python/hardcoded-credentials@v1.0",
+    "detectorName": "Hardcoded credentials",
+    "detectorTags": [
+      "secrets",
+      "security",
+      "owasp-top10",
+      "top25-cwes",
+      "cwe-798",
+      "Python"
+    ],
+    "generatorId": "AmazonCodeGuruSecurity",
+    "id": "95df1ef3ded77f677e2b2606d213b106e11dcea8f7ac8e37904158e842f3e908",
+    "remediation": {
+      "recommendation": {
+        "text": "We detected hardcoded Flask configurations in the application code. Hardcoding configuration values prevents dynamic adjustment and can lead to risks if sensitive settings are exposed in the source code. To remediate, use either `os.getenv()` or  `os.environ.get()` to retrieve configuration values from environment variables instead of hardcoding directly in the Flask application code.\n\n[Learn more](https://cwe.mitre.org/data/definitions/798.html)",
+        "url": "https://docs.aws.amazon.com/amazonq/detector-library/python/hardcoded-credentials"
+      }
+    },
+    "resource": {
+      "id": "ai-code-security-scan-1745330385"
+    },
+    "ruleId": "python-avoid-hardcoded-flask-config",
+    "severity": "Critical",
+    "status": "Open",
+    "title": "CWE-798 - Hardcoded credentials",
+    "type": "Software and Configuration Checks",
+    "updatedAt": "2025-04-22T14:00:03.284000+00:00",
+    "vulnerability": {
+      "filePath": {
+        "codeSnippet": [
+          {
+            "content": "from werkzeug.security import generate_password_hash, check_password_hash",
+            "number": 2
+          },
+          {
+            "content": "from flask_sqlalchemy import SQLAlchemy",
+            "number": 3
+          },
+          {
+            "content": "import os",
+            "number": 4
+          },
+          {
+            "content": "",
+            "number": 5
+          },
+          {
+            "content": "app = Flask(__name__)",
+            "number": 6
+          },
+          {
+            "content": "app.config[\"SQLALCHEMY_DATABASE_URI\"] = \"sqlite:///users.db\"",
+            "number": 7
+          },
+          {
+            "content": "app.config[\"SECRET_KEY\"] = os.urandom(24)",
+            "number": 8
+          },
+          {
+            "content": "db = SQLAlchemy(app)",
+            "number": 9
+          },
+          {
+            "content": "",
+            "number": 10
+          },
+          {
+            "content": "",
+            "number": 11
+          },
+          {
+            "content": "class User(db.Model):",
+            "number": 12
+          }
+        ],
+        "endLine": 7,
+        "name": "app.py",
+        "path": "1-rest-api/flawless/app.py",
+        "startLine": 7
+      },
+      "id": "95df1ef3ded77f677e2b2606d213b106e11dcea8f7ac8e37904158e842f3e908",
+      "referenceUrls": [],
+      "relatedVulnerabilities": [
+        "CWE-798"
+      ]
+    }
+  },
+  {
+    "createdAt": "2025-04-22T13:59:47+00:00",
+    "description": "User-provided inputs must be sanitized before being used to generate a SQL database query. An attacker can create and use untrusted input to run query statements that read, modify, or delete database content.",
+    "detectorId": "python/sql-injection@v1.0",
+    "detectorName": "SQL injection",
+    "detectorTags": [
+      "injection",
+      "security",
+      "sql",
+      "owasp-top10",
+      "top25-cwes",
+      "cwe-89",
+      "Python"
+    ],
+    "generatorId": "AmazonCodeGuruSecurity",
+    "id": "9a5a39fefed954753903323b43fe23f81c5a0fec64aa64986ec8e0047ce71e83",
+    "remediation": {
+      "recommendation": {
+        "text": "We detected an SQL command that might use unsanitized input. This can result in an SQL injection. To increase the security of your code, sanitize inputs before using them to form a query string.\n\n[Learn more](https://cwe.mitre.org/data/definitions/89.html)",
+        "url": "https://docs.aws.amazon.com/amazonq/detector-library/python/sql-injection"
+      },
+      "suggestedFixes": [
+        {
+          "code": "@@ -25,7 +23,5 @@\n     username = request.form[\"username\"]\n     password = request.form[\"password\"]\n-    cursor.execute(\n-        f\"SELECT * FROM users WHERE username = '{username}' AND password = '{password}'\"\n-    )\n+    cursor.execute(f\"SELECT * FROM users WHERE username = %s AND password = %s\", (username, password,))\n     user = cursor.fetchone()\n     if user:\n",
+          "description": "Using parameterized queries helps prevent sql-injection attacks by automatically escaping and quoting values."
+        }
+      ]
+    },
+    "resource": {
+      "id": "ai-code-security-scan-1745330385"
+    },
+    "ruleId": "python-sql-injection",
+    "severity": "High",
+    "status": "Open",
+    "title": "CWE-89 - SQL injection",
+    "type": "Software and Configuration Checks",
+    "updatedAt": "2025-04-22T14:00:03.284000+00:00",
+    "vulnerability": {
+      "filePath": {
+        "codeSnippet": [
+          {
+            "content": "",
+            "number": 22
+          },
+          {
+            "content": "@app.route(\"/login\", methods=[\"POST\"])",
+            "number": 23
+          },
+          {
+            "content": "def login():",
+            "number": 24
+          },
+          {
+            "content": "    username = request.form[\"username\"]",
+            "number": 25
+          },
+          {
+            "content": "    password = request.form[\"password\"]",
+            "number": 26
+          },
+          {
+            "content": "    cursor.execute(",
+            "number": 27
+          },
+          {
+            "content": "        f\"SELECT * FROM users WHERE username = '{username}' AND password = '{password}'\"",
+            "number": 28
+          },
+          {
+            "content": "    )",
+            "number": 29
+          },
+          {
+            "content": "    user = cursor.fetchone()",
+            "number": 30
+          },
+          {
+            "content": "    if user:",
+            "number": 31
+          },
+          {
+            "content": "        return \"Login successful\"",
+            "number": 32
+          }
+        ],
+        "endLine": 27,
+        "name": "app.py",
+        "path": "1-rest-api/flawed/app.py",
+        "startLine": 27
+      },
+      "id": "9a5a39fefed954753903323b43fe23f81c5a0fec64aa64986ec8e0047ce71e83",
+      "referenceUrls": [],
+      "relatedVulnerabilities": [
+        "CWE-89"
+      ]
+    }
+  },
+  {
+    "createdAt": "2025-04-22T13:59:47+00:00",
+    "description": "Allocated resources are not released properly. This can slow down or crash your system. They must be closed along all paths to prevent a resource leak.",
+    "detectorId": "python/resource-leak@v1.0",
+    "detectorName": "Resource leak",
+    "detectorTags": [
+      "availability",
+      "resource-leak",
+      "security",
+      "top25-cwes",
+      "cwe-400",
+      "cwe-664",
+      "Python"
+    ],
+    "generatorId": "AmazonCodeGuruSecurity",
+    "id": "d8d9dbfe28c209eecc9725f331dbcfacaae759cf967b0f2ae29fb95191b69b31",
+    "remediation": {
+      "recommendation": {
+        "text": "**Problem**\nThis line of code might contain a resource leak. Resource leaks can cause your system to slow down or crash.\n\n**Fix**\nConsider closing the following resource: *conn*. The resource is allocated by call *sqlite3.connect*. Execution paths that do not contain closure statements were detected. To prevent this resource leak, close *conn* in a try-finally block or declare it using a `with` statement.\n\n**More info**\n[View details about the `with` statement in the Python developer's guide](https://www.python.org/dev/peps/pep-0343/) (external link).",
+        "url": "https://docs.aws.amazon.com/amazonq/detector-library/python/resource-leak"
+      }
+    },
+    "resource": {
+      "id": "ai-code-security-scan-1745330385"
+    },
+    "ruleId": "python-resource-leak-detector",
+    "severity": "Medium",
+    "status": "Open",
+    "title": "CWE-400,664 - Resource leak",
+    "type": "Software and Configuration Checks",
+    "updatedAt": "2025-04-22T14:00:03.284000+00:00",
+    "vulnerability": {
+      "filePath": {
+        "codeSnippet": [
+          {
+            "content": "import sqlite3",
+            "number": 1
+          },
+          {
+            "content": "from flask import Flask, request",
+            "number": 2
+          },
+          {
+            "content": "",
+            "number": 3
+          },
+          {
+            "content": "app = Flask(__name__)",
+            "number": 4
+          },
+          {
+            "content": "conn = sqlite3.connect(\"users_flawed.db\", check_same_thread=False)",
+            "number": 5
+          },
+          {
+            "content": "cursor = conn.cursor()",
+            "number": 6
+          },
+          {
+            "content": "cursor.execute(",
+            "number": 7
+          },
+          {
+            "content": "    \"CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, username TEXT, password TEXT)\"",
+            "number": 8
+          },
+          {
+            "content": ")",
+            "number": 9
+          },
+          {
+            "content": "",
+            "number": 10
+          }
+        ],
+        "endLine": 5,
+        "name": "app.py",
+        "path": "1-rest-api/flawed/app.py",
+        "startLine": 5
+      },
+      "id": "d8d9dbfe28c209eecc9725f331dbcfacaae759cf967b0f2ae29fb95191b69b31",
+      "referenceUrls": [
+        "https://owasp.org/www-community/vulnerabilities/Unreleased_Resource"
+      ],
+      "relatedVulnerabilities": [
+        "CWE-400",
+        "CWE-664"
+      ]
+    }
+  }
+]

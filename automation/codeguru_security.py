@@ -5,9 +5,10 @@ import json
 import zipfile
 import requests
 from pathlib import Path
+import datetime
 
 # === Configuration ===
-SOURCE_DIR = "."  # Folder to scan
+SOURCE_DIR = "data"  # Folder to scan
 ZIP_FILE = "source.zip"
 RESULT_FILE = "codeguru-security-results.json"
 REGION = "us-east-1"
@@ -56,9 +57,11 @@ def wait_for_results(scan_name: str) -> dict:
     print("Waiting for scan to complete...")
     while True:
         response = codeguru.get_scan(scanName=scan_name)
+
         state = response["scanState"]
-        if state == "Completed":
-            print("Scan completed")
+        print(f"Scan state: {state}")
+        if state == "Successful":
+            print("Scan Successful")
             return response
         elif state in ["Failed", "Canceled"]:
             raise Exception(f"Scan failed or was canceled: {state}")
@@ -66,12 +69,30 @@ def wait_for_results(scan_name: str) -> dict:
 
 
 def fetch_findings(scan_name: str) -> list:
-    paginator = codeguru.get_paginator("list_findings")
     findings = []
-    for page in paginator.paginate(scanName=scan_name):
-        findings.extend(page["findings"])
+    next_token = None
+
+    while True:
+        if next_token:
+            response = codeguru.get_findings(
+                scanName=scan_name, nextToken=next_token)
+        else:
+            response = codeguru.get_findings(scanName=scan_name)
+
+        findings.extend(response.get("findings", []))
+        next_token = response.get("nextToken")
+
+        if not next_token:
+            break
+
     print(f"Found {len(findings)} vulnerabilities")
     return findings
+
+
+def default_serializer(obj):
+    if isinstance(obj, datetime.datetime):
+        return obj.isoformat()
+    raise TypeError(f"Type {type(obj)} not serializable")
 
 
 def main():
@@ -84,7 +105,7 @@ def main():
     findings = fetch_findings(scan_name)
 
     with open(RESULT_FILE, "w") as f:
-        json.dump(findings, f, indent=2)
+        json.dump(findings, f, indent=2, default=default_serializer)
     print(f"Saved findings to {RESULT_FILE}")
 
 
