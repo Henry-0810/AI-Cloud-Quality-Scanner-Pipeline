@@ -1,39 +1,22 @@
-# Benchmark 3 – Comment Quality and NLP Understanding
+# ❌ Known Comment Flaws in benchmark_comments.py
 
-This benchmark tests how well tools like Amazon Q and NLP models understand the **intent** and **clarity** of code based on code comments, naming, and structure.
+1. **Line 8**: `# Do stuff`  
+   - ❌ Vague and uninformative. Doesn't describe what is being processed.
 
-## 🔴 Flaws in `bad_comments/email_validator.py`
+2. **Line 13**: `# loop`  
+   - ❌ Obvious comment. Just states what the line of code is doing.
 
-1. **Poor Naming**:
-   - Function `abc()` gives no insight into its purpose.
-   - Variable names are minimally descriptive (`email`, `EMAIL_REGEX = ".*"`), and the route's function doesn’t reflect validation behavior.
+3. **Line 17**: `# hash password`  
+   - ❌ Misleading. The function actually stores plaintext.
 
-2. **Misleading or Missing Comments**:
-   - The comment `# good email regex` is incorrect; the regex `".*"` allows anything.
-   - No docstring is provided for the endpoint.
-   - Comments like `# validate` and `# start` provide no additional value.
+4. **Line 25**: `# Send data to Kafka`  
+   - ❌ Stale. No Kafka logic exists in the function.
 
-3. **Code Logic Flaws**:
-   - Email validation is not actually performed. The check is `if email != ""`, not a regex match.
-   - Missing fallback (`.get("email", "")`) could cause key errors.
+5. **Line 31**: `# get`  
+   - ❌ Vague. Doesn’t describe what is being “got.”
 
-4. **No Port or Error Logging**:
-   - `app.run()` uses default port and lacks clarity or control.
-   - No logging for invalid data or missing keys.
+6. **Line 35**: `# initialize variable`  
+   - ❌ Obvious. The line `count = 0` is self-explanatory.
 
-## ✅ Features of `good_comments/email_validator.py`
-
-- Clear function and variable names.
-- Correct use of regex for email validation.
-- Inline and block comments that explain what the code does.
-- Includes a meaningful docstring for the endpoint.
-- Proper error tolerance and defaults (`get("email", "")`).
-- Runs on a defined port with explicit configuration.
-
-## 🧪 Evaluation Goal
-
-- Test whether NLP-powered tools can:
-  - Identify poor commenting or lack of documentation.
-  - Suggest meaningful improvements to code structure and readability.
-  - Understand function purpose from both code and comments.
-
+7. **Line 39**: `# This function sorts a list in descending order`  
+   - ❌ Incorrect. The code actually sorts in ascending order.
