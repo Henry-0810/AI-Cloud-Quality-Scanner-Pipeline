@@ -72,48 +72,108 @@ def parse_nlp_results(path):
 def format_markdown(reviewer_findings, security_findings, nlp_findings):
     md = ["## 🤖 AI-Powered Code Review Report\n"]
 
-    # CodeGuru Reviewer Section
-    md.append("### 🔍 CodeGuru Reviewer Findings\n")
+    # Generate summary counts
+    reviewer_counts = count_by_severity(reviewer_findings, "level")
+    security_counts = count_by_severity(security_findings, "severity")
+
+    # Top summary section
+    md.append("### 📊 Summary\n")
+    md.append("| Category | Critical | High | Medium | Low | Info | Total |")
+    md.append("| --- | ---: | ---: | ---: | ---: | ---: | ---: |")
+    md.append(f"| 🔍 CodeGuru | {reviewer_counts.get('critical', 0)} | {reviewer_counts.get('high', 0)} | {reviewer_counts.get('medium', 0)} | {reviewer_counts.get('low', 0)} | {reviewer_counts.get('info', 0)} | {len(reviewer_findings)} |")
+    md.append(f"| 🔐 Security | {security_counts.get('critical', 0)} | {security_counts.get('high', 0)} | {security_counts.get('medium', 0)} | {security_counts.get('low', 0)} | {security_counts.get('info', 0)} | {len(security_findings)} |")
+    md.append(
+        f"| 💬 NLP Comments | - | - | - | - | {len(nlp_findings)} | {len(nlp_findings)} |")
+    md.append("\n")
+
+    # Prioritized findings section
+    md.append("### ⚠️ Top Priority Findings\n")
+    add_top_findings(md, reviewer_findings, security_findings, 3)
+
+    # CodeGuru Reviewer Section - collapsible
+    md.append("<details>")
+    md.append(
+        f"<summary><h3>🔍 CodeGuru Reviewer Findings ({len(reviewer_findings)})</h3></summary>\n")
+
     if not reviewer_findings:
         md.append("✅ No issues found by CodeGuru Reviewer.\n")
     else:
-        grouped = {}
-        for f in reviewer_findings:
-            grouped.setdefault(f["file"], []).append(f)
+        # Group by severity
+        severity_groups = group_by_severity(reviewer_findings, "level")
 
-        for file, issues in grouped.items():
-            md.append(f"#### 📄 File: `{file}`")
-            for i in issues:
+        # Display by severity levels
+        for severity in ["critical", "high", "medium", "low", "info"]:
+            findings = severity_groups.get(severity, [])
+            if findings:
+                severity_emoji = get_severity_emoji(severity)
                 md.append(
-                    f"- Line `{i['line']}` | **{i['level'].upper()}** | **{i['rule']}**\n"
-                    f"  > {i['message']}"
-                )
-            md.append("")
+                    f"#### {severity_emoji} {severity.upper()} ({len(findings)})\n")
 
-    # CodeGuru Security Section
-    md.append("\n---\n")
-    md.append("### 🔐 CodeGuru Security Findings\n")
+                # If many findings of this severity, make them collapsible by file
+                if len(findings) > 5 and severity not in ["critical", "high"]:
+                    # Group by file
+                    file_groups = {}
+                    for f in findings:
+                        file_groups.setdefault(f["file"], []).append(f)
+
+                    for file, issues in file_groups.items():
+                        md.append(
+                            f"<details><summary>📄 <code>{file}</code> ({len(issues)})</summary>\n")
+                        for i in issues:
+                            md.append(
+                                f"- Line `{i['line']}` | **{i['rule']}**\n"
+                                f"  > {i['message']}"
+                            )
+                        md.append("</details>\n")
+                else:
+                    # Display directly for important or few findings
+                    for f in findings:
+                        md.append(
+                            f"- **{f['file']}** (Line `{f['line']}`) | **{f['rule']}**\n"
+                            f"  > {f['message']}"
+                        )
+                md.append("")
+
+    md.append("</details>\n")
+
+    # Security Section - collapsible
+    md.append("<details>")
+    md.append(
+        f"<summary><h3>🔐 CodeGuru Security Findings ({len(security_findings)})</h3></summary>\n")
+
     if not security_findings:
         md.append("✅ No security vulnerabilities found.\n")
     else:
-        grouped = {}
-        for f in security_findings:
-            grouped.setdefault(f["file"], []).append(f)
+        # Group by severity
+        severity_groups = group_by_severity(security_findings, "severity")
 
-        for file, issues in grouped.items():
-            md.append(f"#### 📄 File: `{file}`")
-            for i in issues:
+        # Display by severity levels
+        for severity in ["critical", "high", "medium", "low", "info"]:
+            findings = severity_groups.get(severity, [])
+            if findings:
+                severity_emoji = get_severity_emoji(severity)
                 md.append(
-                    f"- Line `{i['line']}` | **{i['severity'].upper()}** | **{i['title']}**\n"
-                    f"  > {i['description']}\n"
-                    f"  👉 _{i['recommendation']}_\n"
-                    f"  🔗 [Remediation]({i['reference']})\n"
-                )
-            md.append("")
+                    f"#### {severity_emoji} {severity.upper()} ({len(findings)})\n")
 
-    # NLP Analysis Section
-    md.append("\n---\n")
-    md.append("### 💬 NLP Comment Insights\n")
+                for i in findings:
+                    md.append(
+                        f"- **{i['file']}** (Line `{i['line']}`) | **{i['title']}**\n"
+                        f"  > {i['description']}\n"
+                        f"  👉 _{i['recommendation']}_"
+                    )
+                    if i['reference']:
+                        md.append(f"  🔗 [Remediation]({i['reference']})\n")
+                    else:
+                        md.append("\n")
+                md.append("")
+
+    md.append("</details>\n")
+
+    # NLP Analysis Section - collapsible
+    md.append("<details>")
+    md.append(
+        f"<summary><h3>💬 NLP Comment Insights ({len(nlp_findings)})</h3></summary>\n")
+
     if not nlp_findings:
         md.append("✅ No bad comments detected by NLP analysis.\n")
     else:
@@ -122,16 +182,119 @@ def format_markdown(reviewer_findings, security_findings, nlp_findings):
             grouped.setdefault(f["file"], []).append(f)
 
         for file, issues in grouped.items():
-            md.append(f"#### 📄 File: `{file}`")
+            md.append(
+                f"<details><summary>📄 <code>{file}</code> ({len(issues)})</summary>\n")
             for i in issues:
                 md.append(
                     f"- Line `{i['line']}` | **Comment:** {i['comment']}\n"
                     f"  > {i['why']}\n"
                     f"  👉 _{i['suggestion']}_\n"
                 )
-            md.append("")
+            md.append("</details>\n")
+
+    md.append("</details>\n")
 
     return "\n".join(md)
+
+# Helper functions
+
+
+def count_by_severity(findings, severity_key):
+    counts = {"critical": 0, "high": 0, "medium": 0, "low": 0, "info": 0}
+    for f in findings:
+        severity = f.get(severity_key, "").lower()
+        if severity in ["critical", "error", "warning"]:
+            counts["critical"] += 1
+        elif severity == "high":
+            counts["high"] += 1
+        elif severity in ["medium", "note"]:
+            counts["medium"] += 1
+        elif severity == "low":
+            counts["low"] += 1
+        else:
+            counts["info"] += 1
+    return counts
+
+
+def group_by_severity(findings, severity_key):
+    groups = {"critical": [], "high": [], "medium": [], "low": [], "info": []}
+    for f in findings:
+        severity = f.get(severity_key, "").lower()
+        if severity in ["critical", "error", "warning"]:
+            groups["critical"].append(f)
+        elif severity == "high":
+            groups["high"].append(f)
+        elif severity in ["medium", "note"]:
+            groups["medium"].append(f)
+        elif severity == "low":
+            groups["low"].append(f)
+        else:
+            groups["info"].append(f)
+    return groups
+
+
+def get_severity_emoji(severity):
+    if severity == "critical":
+        return "🔴"
+    elif severity == "high":
+        return "🟠"
+    elif severity == "medium":
+        return "🟡"
+    elif severity == "low":
+        return "🟢"
+    else:
+        return "📝"
+
+
+def add_top_findings(md, reviewer_findings, security_findings, limit=3):
+    # Combine and sort all critical and high findings
+    top_issues = []
+
+    # Add reviewer findings
+    reviewer_groups = group_by_severity(reviewer_findings, "level")
+    for severity in ["critical", "high"]:
+        for finding in reviewer_groups.get(severity, []):
+            top_issues.append({
+                "type": "CodeGuru",
+                "file": finding["file"],
+                "line": finding["line"],
+                "title": finding["rule"],
+                "message": finding["message"],
+                "severity": severity
+            })
+
+    # Add security findings
+    security_groups = group_by_severity(security_findings, "severity")
+    for severity in ["critical", "high"]:
+        for finding in security_groups.get(severity, []):
+            top_issues.append({
+                "type": "Security",
+                "file": finding["file"],
+                "line": finding["line"],
+                "title": finding["title"],
+                "message": finding["description"],
+                "recommendation": finding["recommendation"],
+                "severity": severity
+            })
+
+    # Sort by severity (critical first)
+    top_issues.sort(key=lambda x: 0 if x["severity"] == "critical" else 1)
+
+    # Display top findings
+    if top_issues:
+        for i, issue in enumerate(top_issues[:limit]):
+            severity_emoji = get_severity_emoji(issue["severity"])
+            md.append(
+                f"{i+1}. {severity_emoji} **[{issue['type']}]** {issue['file']} (Line {issue['line']})")
+            md.append(f"   **{issue['title']}**")
+            md.append(f"   > {issue['message']}")
+            if issue.get("recommendation"):
+                md.append(f"   👉 {issue['recommendation']}")
+            md.append("")
+    else:
+        md.append("✅ No critical or high priority issues found.")
+
+    md.append("")
 
 
 def post_github_issue(title, body):
