@@ -24,7 +24,7 @@ jobs:
           
           - name: Clean up unneeded files
             run: |
-              rm -rf .git .venv __pycache__ .pytest_cache node_modules || true
+              rm -rf .venv __pycache__ .pytest_cache node_modules || true
               sudo apt-get clean
 
           - name: Set up AWS credentials
