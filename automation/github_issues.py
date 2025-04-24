@@ -4,6 +4,7 @@ import requests
 
 SARIF_PATH = "sarif-artifacts/codeguru-results.sarif.json"
 SECURITY_JSON_PATH = "codeguru-security-results.json"
+NLP_JSON_PATH = "nlp-results.json"
 
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 REPO = os.getenv("GITHUB_REPOSITORY")
@@ -52,7 +53,23 @@ def parse_codeguru_security(path):
     return parsed
 
 
-def format_markdown(reviewer_findings, security_findings):
+def parse_nlp_results(path):
+    with open(path, "r") as f:
+        findings = json.load(f)
+
+    parsed = []
+    for finding in findings:
+        parsed.append({
+            "file": finding.get("file", "N/A"),
+            "line": finding.get("line", "?"),
+            "comment": finding.get("comment", ""),
+            "why": finding.get("why", ""),
+            "suggestion": finding.get("suggestion", "")
+        })
+    return parsed
+
+
+def format_markdown(reviewer_findings, security_findings, nlp_findings):
     md = ["## 🤖 AI-Powered Code Review Report\n"]
 
     # CodeGuru Reviewer Section
@@ -94,6 +111,26 @@ def format_markdown(reviewer_findings, security_findings):
                 )
             md.append("")
 
+    # NLP Analysis Section
+    md.append("\n---\n")
+    md.append("### 💬 NLP Comment Insights\n")
+    if not nlp_findings:
+        md.append("✅ No bad comments detected by NLP analysis.\n")
+    else:
+        grouped = {}
+        for f in nlp_findings:
+            grouped.setdefault(f["file"], []).append(f)
+
+        for file, issues in grouped.items():
+            md.append(f"#### 📄 File: `{file}`")
+            for i in issues:
+                md.append(
+                    f"- Line `{i['line']}` | **Comment:** {i['comment']}\n"
+                    f"  > {i['why']}\n"
+                    f"  👉 _{i['suggestion']}_\n"
+                )
+            md.append("")
+
     return "\n".join(md)
 
 
@@ -128,7 +165,9 @@ if __name__ == "__main__":
 
     reviewer_findings = parse_codeguru_sarif(SARIF_PATH)
     security_findings = parse_codeguru_security(SECURITY_JSON_PATH)
+    nlp_findings = parse_nlp_results(NLP_JSON_PATH)
 
-    markdown = format_markdown(reviewer_findings, security_findings)
+    markdown = format_markdown(
+        reviewer_findings, security_findings, nlp_findings)
     post_github_issue(
         "🤖 AI Code Review Report (CodeGuru + Security)", markdown)

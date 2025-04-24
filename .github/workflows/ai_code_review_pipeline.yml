@@ -89,13 +89,35 @@ jobs:
     # -------------------
     # Step 3: Run NLP
     # -------------------   
-    
+    nlp-analysis:
+        runs-on: ubuntu-latest
+        needs: codeguru-security
+
+        steps:
+          - name: Checkout Code
+            uses: actions/checkout@v3
+
+          - name: Set up Python
+            uses: actions/setup-python@v4
+            with:
+              python-version: '3.12'
+
+          - name: Install Dependencies
+            run: |
+              pip install poetry
+              poetry install
+
+          - name: Run NLP Comment Quality Scanner
+            run: |
+              poetry run python automation/nlp_comment_check.py
+            env:
+              OPENAI_TOKEN: ${{ secrets.OPENAI_TOKEN }}
     # -------------------
     # Step 4: Post GitHub Issue with Combined Results
     # -------------------
     post-github-issue:
         name: Post GitHub Issue
-        needs: codeguru-security
+        needs: nlp-analysis
         runs-on: ubuntu-latest
 
         steps:

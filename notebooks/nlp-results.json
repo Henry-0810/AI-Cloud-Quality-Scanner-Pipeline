@@ -1,0 +1,74 @@
+[
+  {
+    "file": "../data/3-comments-nlp/benchmark_comments.py",
+    "line": 9,
+    "comment": "# Do stuff",
+    "quality": "bad",
+    "why": "The comment is vague and does not provide any useful information about what \"Do stuff\" actually means.",
+    "suggestion": "Provide a brief description of the specific action or purpose of the code following the comment."
+  },
+  {
+    "file": "../data/3-comments-nlp/benchmark_comments.py",
+    "line": 14,
+    "comment": "# loop",
+    "quality": "bad",
+    "why": "The comment does not provide any additional information or context about the purpose of the loop.",
+    "suggestion": "Add a brief description of what the loop is doing, such as \"Doubling each element in the data list.\""
+  },
+  {
+    "file": "../data/3-comments-nlp/benchmark_comments.py",
+    "line": 18,
+    "comment": "# Check",
+    "quality": "bad",
+    "why": "The comment \"Check\" is vague and does not provide any context or explanation of what is being checked.",
+    "suggestion": "Provide a more descriptive comment such as \"Return the data for verification.\""
+  },
+  {
+    "file": "../data/3-comments-nlp/benchmark_comments.py",
+    "line": 24,
+    "comment": "# hash password",
+    "quality": "bad",
+    "why": "The comment is not clear and does not provide any additional information or context about what is being done in the code.",
+    "suggestion": "Add a brief description of the purpose or method used to hash the password, such as \"Using SHA-256 for password hashing\"."
+  },
+  {
+    "file": "../data/3-comments-nlp/benchmark_comments.py",
+    "line": 30,
+    "comment": "# Validate user input",
+    "quality": "bad",
+    "why": "The comment is redundant and does not provide any additional information or context to the code.",
+    "suggestion": "Add a more descriptive comment explaining how the user input is being validated."
+  },
+  {
+    "file": "../data/3-comments-nlp/benchmark_comments.py",
+    "line": 38,
+    "comment": "# Send data to Kafka",
+    "quality": "bad",
+    "why": "The comment is too vague and does not provide any context or explanation about how the data is being sent to Kafka.",
+    "suggestion": "Add a brief description of what kind of data is being sent or how it is being sent to Kafka."
+  },
+  {
+    "file": "../data/3-comments-nlp/benchmark_comments.py",
+    "line": 44,
+    "comment": "# get",
+    "quality": "bad",
+    "why": "The comment is too vague and does not provide any context or explanation for the code it is associated with.",
+    "suggestion": "Add a brief description of what is being retrieved or why the 'get' operation is being performed."
+  },
+  {
+    "file": "../data/3-comments-nlp/benchmark_comments.py",
+    "line": 52,
+    "comment": "# initialize variable",
+    "quality": "bad",
+    "why": "The comment simply restates what the code is doing without providing any additional context or explanation.",
+    "suggestion": "Add a brief explanation of why the variable is being initialized or what its purpose is in the code."
+  },
+  {
+    "file": "../data/3-comments-nlp/benchmark_comments.py",
+    "line": 55,
+    "comment": "# This function sorts a list in descending order",
+    "quality": "bad",
+    "why": "The comment is too generic and does not provide any additional information or context about the specific function or how it sorts the list.",
+    "suggestion": "Specify the sorting algorithm used or provide an example input/output to give more context."
+  }
+]
